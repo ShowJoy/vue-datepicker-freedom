@@ -1,58 +1,57 @@
 <template>
   <div>
+    <date-picker :inline="true" v-model="date" language="zh" @selected="changeDate"></date-picker>
+    <date-picker placeholder="Select Date"></date-picker>
+    <div style="height: 200px">
+      <el-group-select v-model="selectedIds" :data="groups"></el-group-select>
+    </div>
     <span class="sparkline" @click="onClick()">2 5 6 7 7 23 9</span>
     <currency-input v-model="price"></currency-input>
     {{price}}
-    <input type="file" accept="image/*" multiple @change="fileinfo($event.target.files)"/>
+    <div id="output"></div>
+    <input type="file" accept="image/*" @change="fileinfo($event.target.files)"/>
     <canvas id="cvs" width="600" height="300"></canvas>
+    <!-- <div id="droptarget"></div> -->
   </div>
 </template>
 
 <script>
-import { sparkLine } from 'utils/canvas-helper';
+import { sparkLine, drawRect, drawLine, Barchart } from 'utils/canvas-helper';
+import { readFile } from 'utils/base';
 import imgSrc from 'app/assets/cat.jpeg';
-import { makeResponse } from 'utils/SearWorker.js';
 
 export default {
   data() {
     return {
-      price: null
+      date: '',
+      price: null,
+      groups: Array.apply(null, { length: 2 }).map((g, groupIndex) => {
+        return {
+          id: `group_${groupIndex + 1}`,
+          label: `分组${groupIndex + 1}`,
+          children: Array.apply(null, { length: 8 }).map((c, i) => {
+            return {
+              id: `option_${groupIndex + 1}_${i + 1}`,
+              label: `选项_${groupIndex + 1}_${i + 1}`
+            };
+          })
+        };
+      }),
+      selectedIds: []
     };
   },
   methods: {
+    changeDate(selected, checked) {
+      console.log('current date:', selected, checked);
+      console.log('previous date: ', this.date);
+    },
     fileinfo(files) {
       console.log(files);
+      readFile(files[0]);
     },
     onClick() {
-      console.log('click');
-      let cvs = document.createElement('canvas');
-      let ctx = cvs.getContext('2d');
-
-      let img = new Image();
-      img.src = imgSrc;
-      img.onload = function() {
-        console.log('loaded');
-        cvs.width = img.width;
-        cvs.height = img.height;
-
-        ctx.drawImage(img, 0, 0);
-        let pixels = ctx.getImageData(0, 0, img.width, img.height);
-
-        let response = makeResponse();
-        let worker = new Worker(URL.createObjectURL(new Blob([response], { type: 'application/javascript' })));
-
-        worker.postMessage(pixels);
-        worker.onmessage = function(e) {
-          console.log('worker', e);
-          let smeared_pixels = e.data;
-          ctx.putImageData(smeared_pixels, 0, 0);
-          let img2 = document.createElement('img');
-          img2.src = cvs.toDataURL();
-          document.body.appendChild(img2);
-          worker.terminate();
-          cvs.width = cvs.height = 0;
-        };
-      };
+      // wokerDemo();
+      console.log(this.date);
     }
   },
   mounted() {
@@ -61,50 +60,17 @@ export default {
 
     let cvs = document.querySelector('#cvs');
     let ctx = cvs.getContext('2d');
+    // let droptarget = document.querySelector('#droptarget');
 
-    let ball = {
-      x: 100,
-      y: 100,
-      radius: 25,
-      vx: 5,
-      vy: 2,
-      color: 'blue',
-      raf: null,
-      draw: function() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-        ctx.closePath();
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
-    };
+    // let barChart = new Barchart({
+    //   canvas: cvs,
+    //   data: [112, 62, 42],
+    //   lengend: {
+    //     names: ['a', 'b', 'c']
+    //   }
+    // });
 
-    function draw() {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.fillRect(0, 0, cvs.width, cvs.height);
-      ball.draw();
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      ball.vy *= 0.99;
-      ball.vy += 0.25;
-      if (ball.x + ball.vx + ball.radius > cvs.width || ball.x + ball.vx - ball.radius < 0) {
-        ball.vx = -ball.vx;
-      }
-      if (ball.y + ball.vy + ball.radius > cvs.height || ball.y + ball.vy - ball.radius < 0) {
-        ball.vy = -ball.vy;
-      }
-      ball.raf = window.requestAnimationFrame(draw);
-    }
-
-    cvs.addEventListener('mouseover', () => {
-      ball.raf = window.requestAnimationFrame(draw);
-    });
-    cvs.addEventListener('mouseout', () => {
-      window.cancelAnimationFrame(ball.raf);
-    });
-
-    ball.draw();
+    // barChart.draw();
   }
 };
 </script>
@@ -112,5 +78,14 @@ export default {
   .sparkline {
     background-color: '#ddd';
     color: red;
+  }
+  #droptarget {
+    border: 1px solid black;
+    width: 200px;
+    height: 200px;
+
+    &.active {
+      border: 2px dashed red;
+    }
   }
 </style>
