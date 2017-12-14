@@ -1,4 +1,4 @@
-import DateLanguages from './languages'
+import DateLanguages from './languages';
 
 export default {
 
@@ -9,9 +9,17 @@ export default {
    */
   isValidDate (date) {
     if (Object.prototype.toString.call(date) !== '[object Date]') {
-      return false
+      return false;
     }
-    return !isNaN(date.getTime())
+    return !isNaN(date.getTime());
+  },
+
+  isArray (obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]';
+  },
+
+  isFunction (obj) {
+    return Object.prototype.toString.call(obj) === '[object Function]';
   },
 
   /**
@@ -22,9 +30,9 @@ export default {
    */
   getDayNameAbbr (date, days) {
     if (typeof date !== 'object') {
-      throw TypeError('Invalid Type')
+      throw TypeError('Invalid Type');
     }
-    return days[date.getDay()]
+    return days[date.getDay()];
   },
 
   /**
@@ -35,15 +43,15 @@ export default {
    */
   getMonthName (month, months) {
     if (!months) {
-      throw Error('missing 2nd parameter Months array')
+      throw Error('missing 2nd parameter Months array');
     }
     if (typeof month === 'object') {
-      return months[month.getMonth()]
+      return months[month.getMonth()];
     }
     if (typeof month === 'number') {
-      return months[month]
+      return months[month];
     }
-    throw TypeError('Invalid type')
+    throw TypeError('Invalid type');
   },
 
   /**
@@ -53,15 +61,15 @@ export default {
    */
   getMonthNameAbbr (month, monthsAbbr) {
     if (!monthsAbbr) {
-      throw Error('missing 2nd paramter Months array')
+      throw Error('missing 2nd paramter Months array');
     }
     if (typeof month === 'object') {
-      return monthsAbbr[month.getMonth()]
+      return monthsAbbr[month.getMonth()];
     }
     if (typeof month === 'number') {
-      return monthsAbbr[month]
+      return monthsAbbr[month];
     }
-    throw TypeError('Invalid type')
+    throw TypeError('Invalid type');
   },
 
   /**
@@ -71,7 +79,7 @@ export default {
    * @return {Number}
    */
   daysInMonth (year, month) {
-    return /8|3|5|10/.test(month) ? 30 : month === 1 ? (!(year % 4) && year % 100) || !(year % 400) ? 29 : 28 : 31
+    return /8|3|5|10/.test(month) ? 30 : month === 1 ? (!(year % 4) && year % 100) || !(year % 400) ? 29 : 28 : 31;
   },
 
   /**
@@ -84,15 +92,15 @@ export default {
       case 1:
       case 21:
       case 31:
-        return 'st'
+        return 'st';
       case 2:
       case 22:
-        return 'nd'
+        return 'nd';
       case 3:
       case 23:
-        return 'rd'
+        return 'rd';
       default:
-        return 'th'
+        return 'th';
     }
   },
 
@@ -104,10 +112,10 @@ export default {
    * @return {String}
    */
   formatDate (date, format, translation) {
-    translation = (!translation) ? DateLanguages.translations.en : translation
-    let year = date.getFullYear()
-    let month = date.getMonth() + 1
-    let day = date.getDate()
+    translation = (!translation) ? DateLanguages.translations.en : translation;
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
     let str = format
       .replace(/dd/, ('0' + day).slice(-2))
       .replace(/d/, day)
@@ -118,8 +126,8 @@ export default {
       .replace(/MM/, ('0' + month).slice(-2))
       .replace(/M(?!a|ä)/, month)
       .replace(/su/, this.getNthSuffix(date.getDate()))
-      .replace(/D(?!e|é|i)/, this.getDayNameAbbr(date, translation.days))
-    return str
+      .replace(/D(?!e|é|i)/, this.getDayNameAbbr(date, translation.days));
+    return str;
   },
 
   /**
@@ -129,12 +137,48 @@ export default {
    * @return {Array}
    */
   createDateArray (start, end) {
-    let dates = []
+    let dates = [];
     while (start <= end) {
-      dates.push(new Date(start))
-      start = new Date(start).setDate(new Date(start).getDate() + 1)
+      dates.push(new Date(start));
+      start = new Date(start).setDate(new Date(start).getDate() + 1);
     }
-    return dates
+    return dates;
+  },
+
+  /**
+   * Extend an array of dates from another array of dates. 
+   * @param {Date} one 
+   * @param {Date} two 
+   */
+  extendDateArray(one, two) {
+    return one.concat(two).reduce((arr, val) => {
+      if (arr.indexOf(val) < 0) {
+        arr.push(val);
+      }
+      return arr;
+    }, []);
+  },
+
+  /**
+   * return an array of dates filter by another array of dates. 
+   * @param {Date} one 
+   * @param {Date} two 
+   */
+  filterDateArray(one, two) {
+    return one.filter(item => two.indexOf(item) === -1);
+  },
+
+  /**
+   * tranform date object to number
+   * @param {Array} dates 
+   * @return {Array}
+   */
+  dateToNum(dates) {
+    return dates.map(date => +date);
+  },
+
+  copy(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 
 }

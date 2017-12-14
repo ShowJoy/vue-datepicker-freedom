@@ -55,8 +55,18 @@ function readFile(f) {
     console.log('Error: ', e);
   };
 }
+// 扩展数组
+function extendArr(one, two) {
+  return one.concat(two).reduce((arr, val) => {
+    if (arr.indexOf(val) < 0) {
+      arr.push(val);
+    }
+    return arr;
+  }, []);
+}
 
 export {
   dragFile,
-  readFile
+  readFile,
+  extendArr
 };
