@@ -19,8 +19,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    // 自动补全的扩展名
-    extensions: ['.vue', '.js', '.json', '.ts'],
+    extensions: ['.vue', '.js', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.common.js',
       'src': resolve('src')

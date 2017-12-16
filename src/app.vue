@@ -18,8 +18,11 @@
 </template>
 
 <script>
-
+import DatePicker from 'src/component/date-picker'
 export default {
+  components: {
+    DatePicker
+  },
   data() {
     let self = this;
     return {
