@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div>
     <date-picker inline v-model="date"
       :format="format"
       showTool
