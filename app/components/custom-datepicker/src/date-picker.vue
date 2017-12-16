@@ -1,33 +1,41 @@
 <template>
   <div class="custom-datepicker" :class="[wrapperClass, isRtl ? 'rtl' : '']">
-    <div :class="['custom-datepicker__input', {'input-group' : bootstrapStyling}]">
-      <!-- Calendar Button -->
-      <span class="custom-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" v-if="calendarButton" @click="showCalendar" v-bind:style="{'cursor:not-allowed;' : disabledPicker}">
-        <i :class="calendarButtonIcon">
-          {{ calendarButtonIconContent }}
-          <span v-if="!calendarButtonIcon">&hellip;</span>
-        </i>
+    <symbol id="icon-delete" viewBox="3 3 18 18">
+      <title>delete</title>
+      <path d="M12 4c-4.419 0-8 3.582-8 8s3.581 8 8 8 8-3.582 8-8-3.581-8-8-8zM15.707 14.293c0.391 0.391 0.391 1.023 0 1.414-0.195 0.195-0.451 0.293-0.707 0.293s-0.512-0.098-0.707-0.293l-2.293-2.293-2.293 2.293c-0.195 0.195-0.451 0.293-0.707 0.293s-0.512-0.098-0.707-0.293c-0.391-0.391-0.391-1.023 0-1.414l2.293-2.293-2.293-2.293c-0.391-0.391-0.391-1.023 0-1.414s1.023-0.391 1.414 0l2.293 2.293 2.293-2.293c0.391-0.391 1.023-0.391 1.414 0s0.391 1.023 0 1.414l-2.293 2.293 2.293 2.293z"></path>
+    </symbol>
+    <div class="custom-datepicker__select" v-if="!inline">
+      <!-- Calendar icon -->
+      <span class="custom-datepicker__select-prefix">
+        <svg class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+          <title>calendar</title>
+          <path fill="#c0c4cc" d="M10 12h4v4h-4zM16 12h4v4h-4zM22 12h4v4h-4zM4 24h4v4h-4zM10 24h4v4h-4zM16 24h4v4h-4zM10 18h4v4h-4zM16 18h4v4h-4zM22 18h4v4h-4zM4 18h4v4h-4zM26 0v2h-4v-2h-14v2h-4v-2h-4v32h30v-32h-4zM28 30h-26v-22h26v22z"></path>
+        </svg>
       </span>
-      <!-- Input -->
-      <input
-        :type="inline ? 'hidden' : 'text'"
-        :class="[ inputClass, { 'form-control' : bootstrapStyling } ]"
-        :name="name"
-        :ref="refName"
-        :id="id"
-        @click="showCalendar"
-        :value="formattedValue"
-        :open-date="openDate"
-        :placeholder="placeholder"
-        :clear-button="clearButton"
-        :disabled="disabledPicker"
-        :required="required"
-        readonly>
-      <!-- Clear Button -->
-      <span class="custom-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" v-if="clearButton && selectedDate" @click="clearDate()">
-        <i :class="clearButtonIcon">
-          <span v-if="!clearButtonIcon">&times;</span>
-        </i>
+      <div :class="['custom-datepicker__select-fakeinput', , {'is-check': isCheck}]">
+        <div class="custom-datepicker__select-display">
+          <span :class="['custom-datepicker__select-item', {'is-check': isCheck}]" v-for="(val, index) in formattedValue" :key="index">{{ val }}<svg @click="clearDate(index)" class="icon icon-delete" transform="translate(3 3)" v-if="isCheck"><use xlink:href="#icon-delete"></use></svg></span>
+        </div>
+        <!-- Input -->
+        <input
+          :type="inline ? 'hidden' : 'text'"
+          :class="inputClass"
+          :name="name"
+          :ref="refName"
+          :id="id"
+          @click="showCalendar"
+          :value="inputValue"
+          :open-date="openDate"
+          :placeholder="placeholder"
+          :clear-button="clearButton"
+          :disabled="disabledPicker"
+          :required="required"
+          :style="`height: ${ selectHeight }px`"
+          readonly>
+      </div>
+      <!-- Clear icon -->
+      <span class="custom-datepicker__select-suffix" v-show="clearable && selectedDate && !isCalendarShow && !isCheck" @click="clearDate">
+        <svg class="icon"><use xlink:href="#icon-delete"></use></svg>
       </span>
     </div>
     <div :class="['custom-datepicker__body', sidebarPosition]">
@@ -40,7 +48,7 @@
           @click="barClick(bar)">{{ bar.text }}
         </span>
       </section>
-      <section :class="['custom-datepicker__calendar', {'inline': inline}]" :style="calendarStyle" v-show="showDayView || showMonthView || showYearView">
+      <section :class="['custom-datepicker__calendar', {'inline': inline}]" :style="calendarStyle" v-show="isCalendarShow">
         <!-- Day View -->
         <template v-if="allowedToShowView('day')">
           <div :class="[calendarClass, 'custom-datepicker__calendar-day']" v-show="showDayView">
@@ -49,7 +57,7 @@
                 @click="isRtl ? nextMonth() : previousMonth()"
                 class="prev"
                 v-bind:class="{ 'disabled' : isRtl ? nextMonthDisabled(pageTimestamp) : previousMonthDisabled(pageTimestamp) }">&lt;</span>
-              <span @click="showMonthCalendar" :class="allowedToShowView('month') ? 'up' : ''">{{ currMonthName }} {{ currYear }}
+              <span @click="showMonthCalendar" :class="allowedToShowView('month') ? 'up' : ''"> {{ currentYearAndMonthText }}
               </span>
               <span
                 @click="isRtl ? previousMonth() : nextMonth()"
@@ -115,12 +123,12 @@
 
         <div class="custom-datepicker__calendar-footer" v-show="isCheck && showDayView && showTool">
           <div>
-            <button type="button" @click="resetDayGroups">重置</button>
-            <button @click="clearCheckedDate">清除</button>
+            <button type="button" @click="resetDayGroups">{{ translation.buttons.reset }}</button>
+            <button @click="clearCheckedDate">{{ translation.buttons.clear }}</button>
           </div>
           <div v-if="!inline">
-            <button type="button" @click="cancel">取消</button>
-            <button type="button" @click="confirm">确定</button>
+            <button type="button" @click="cancel">{{ translation.buttons.cancel }}</button>
+            <button type="button" @click="confirm">{{ translation.buttons.confirm }}</button>
           </div>
         </div>
       </section>
@@ -175,6 +183,7 @@ export default {
     disabledPicker: Boolean,
     required: Boolean,
     showTool: Boolean,
+    clearable: Boolean,
     minimumView: {
       type: String,
       default: 'day'
@@ -190,6 +199,11 @@ export default {
     defaultDayGroups: {
       type: Array,
       default: () => []
+    },
+    // picker initial height
+    height: {
+      type: Number,
+      default: 35
     }
   },
   data () {
@@ -224,12 +238,17 @@ export default {
       /**
        * save default checked dates
        */
-      defaultValue: []
+      defaultValue: [],
+      selectHeight: 0
     }
   },
   watch: {
-    value (value) {
-      this.setValue(value);
+    value: {
+      handler: function (value) {
+        this.computeSelectHeight();
+        this.setValue(value);
+      },
+      immediate: true
     },
     openDate () {
       this.setPageDate();
@@ -238,11 +257,13 @@ export default {
       this.setInitialView();
     },
     defaultDayGroups(value) {
-      console.log(value, this.defaultDayGroups);
       this.dayGroups = Utils.copy(this.defaultDayGroups);
     }
   },
   computed: {
+    isCalendarShow() {
+      return this.showDayView || this.showMonthView || this.showYearView;
+    },
     // sidebar position: left/top/bottom/right
     sidebarPosition() {
       return this.sidebarOptions && this.sidebarOptions.position;
@@ -261,18 +282,21 @@ export default {
     pageDate () {
       return new Date(this.pageTimestamp);
     },
+    inputValue() {
+      return this.formattedValue.length ? ' ' : '';
+    },
     formattedValue () {
       const isFunction = Utils.isFunction(this.format);
-      if (this.isCheck && this.value.length) {
+      if (this.isCheck && this.value) {
         let dateArr = this.value.map(date => {
           return isFunction ? this.format(new Date(date)) : Utils.formatDate(new Date(date), this.format, this.translation);
         });
-        return dateArr.join();
+        return dateArr;
       } else {
         if (!this.selectedDate) {
-          return null;
+          return [];
         }
-        return isFunction ? this.format(this.selectedDate) : Utils.formatDate(new Date(this.selectedDate), this.format, this.translation);
+        return [isFunction ? this.format(this.selectedDate) : Utils.formatDate(new Date(this.selectedDate), this.format, this.translation)];
       }
     },
     translation () {
@@ -284,6 +308,9 @@ export default {
     },
     currYear () {
       return this.pageDate.getFullYear();
+    },
+    currentYearAndMonthText(){
+      return this.language === 'zh' ? `${this.currYear} ${this.currMonthName}` : `${this.currMonthName} ${this.currYear}`;
     },
     /**
      * Returns the day number of the week less one for the first of the current month
@@ -384,6 +411,12 @@ export default {
     }
   },
   methods: {
+    computeSelectHeight() {
+      this.$nextTick(() => {
+        const display = this.$el.querySelector('.custom-datepicker__select-display');
+        display && (this.selectHeight = Math.max(display.offsetHeight, this.height));
+      });
+    },
     /**
      * Close all calendar layers
      * @param { Boolean } isConfirm click from confirm button 
@@ -506,11 +539,22 @@ export default {
       this.$emit('selected', this.isCheck ? tempValue : new Date(date));
       this.$emit('input', this.isCheck ? tempValue : new Date(date));
     },
-    clearDate () {
-      this.selectedDate = null;
-      this.$emit('selected',this.isCheck ? [] : null);
-      this.$emit('input', this.isCheck ? [] : null);
-      this.$emit('cleared');
+    clearDate (index) {
+      if (typeof index === 'number') {
+        let tempValue = Utils.copy(this.value);
+        tempValue.splice(index, 1);
+        this.$emit('selected',this.isCheck ? tempValue : null);
+        this.$emit('input',this.isCheck ? tempValue : null);
+      } else {
+        this.selectedDate = null;
+        this.$emit('selected',this.isCheck ? [] : null);
+        this.$emit('input', this.isCheck ? [] : null);
+        this.$emit('cleared');
+      }
+      
+      this.$nextTick(() => {
+        this.setDefaultValue();
+      });
     },
     /**
      * @param {Object} day
@@ -912,6 +956,9 @@ export default {
       if (Utils.isValidDate(date)) {
         this.selectedDate = date;
         this.setPageDate(date);
+      } else if (Utils.isArray(date) && !isNaN(date[0])) {
+        this.selectedDate = new Date(date[0]);
+        this.setPageDate(date[0]);
       }
     },
     setPageDate (date) {
@@ -1008,26 +1055,30 @@ export default {
 <style lang="stylus" scoped>
 $width = 300px
 $barWidth = 110px
-$selectedColor = #4bd
+$iconWidth = 16px
+$hoverColor = #409eff
+$selectedColor = #409eff
+$disabledColor = #ddd
 $border = 1px solid #dfe4ed
 
 .rtl
   direction:rtl
 .custom-datepicker
+  display inline-block
   position relative
   text-align left
   *
     box-sizing border-box
 
   &__body
+    user-select none
     display flex
-    max-width 410px
+    max-width $width + $barWidth
     &-sidebar
       padding: 10px
       width $barWidth
       border $border
       border-right 0
-      box-sizing border-box
       background-color #fff
       overflow auto
     &-bar
@@ -1040,18 +1091,20 @@ $border = 1px solid #dfe4ed
       cursor pointer
   
   &__body.top
+    width $width
     flex-direction column
     .custom-datepicker__body-sidebar
-      width $barWidth
+      width 100%
       border $border
       border-bottom 0
     .custom-datepicker__body-bar
       display inline
 
   &__body.bottom
+    width $width
     flex-direction column-reverse
     .custom-datepicker__body-sidebar
-      width $barWidth
+      width 100%
       border $border
       border-top 0
 
@@ -1062,18 +1115,66 @@ $border = 1px solid #dfe4ed
       border $border
       border-left 0
   
-  &__input
-    width 220px
+  &__select
+    position relative
+    display inline-block
+    border-radius 2px
+    border $border
+    min-height 35px
+    padding 0 25px
+    .icon
+      display inline-block
+      width $iconWidth
+      height $iconWidth
+      fill #c0c4cc
+    .icon-delete
+      pointer-events auto
+      cursor pointer
+    
+    &-fakeinput.is-check
+      width 220px
+    &-fakeinput
+      font-size 14px
+      position relative
+      width 160px
+      display inline-block
+    &-display
+      position absolute
+      z-index 1
+      pointer-events none
+      width 100%
+      top 50%
+      transform translateY(-50%)
+    &-item.is-check
+      border none
+      padding 3px 6px
+      background-color #f0f2f5
+      color #909399
+      margin 2px
+      display inline-block
     input
       -webkit-appearance none
-      border-radius 2px
-      border $border
-      height 35px
       outline none
-      padding 0 10px
-      transition border-color .2s cubic-bezier(.645,.045,.355,1)
+      border none
       width 100%
-      font-size 14px
+    &-prefix
+      position absolute
+      left 5px
+      height 100%
+    &-suffix
+      position absolute
+      height 100%
+      right 5px
+      top 0
+      cursor pointer
+      display none
+    &-suffix
+    &-prefix
+      svg.icon
+        height 100%
+    &:hover
+      .custom-datepicker__select-suffix
+        display block
 
 .custom-datepicker__calendar:not(.inline)
   margin-top 10px
@@ -1114,38 +1215,23 @@ $border = 1px solid #dfe4ed
     .next
       width (100/7)%
       float left
-      text-indent -10000px
       position relative
-      &:after
-        content ''
-        position absolute
-        left 50%
-        top 50%
-        transform translateX(-50%) translateY(-50%)
-        border 6px solid transparent
+      font-size 20px
 
-    .prev
-      &:after
-        border-right 10px solid #000
-        margin-left -5px
-      &.disabled:after
-        border-right 10px solid #ddd
-    .next
-      &:after
-        border-left 10px solid #000
-        margin-left 5px
-      &.disabled:after
-        border-left 10px solid #ddd
+    .prev.disabled
+      color $disabledColor
+    .next.disabled
+      color $disabledColor
 
     .prev:not(.disabled)
     .next:not(.disabled)
     .up:not(.disabled)
       cursor pointer
       &:hover
-        background #eee
+        color $hoverColor
 
   .disabled
-    color #ddd
+    color $disabledColor
     cursor default
   .flex-rtl
     display flex
@@ -1155,6 +1241,7 @@ $border = 1px solid #dfe4ed
   .cell:not(.day)
      border-radius 0
   .cell
+    user-select none    
     position relative
     display inline-block
     padding 0 5px
@@ -1170,7 +1257,7 @@ $border = 1px solid #dfe4ed
     &:not(.blank):not(.disabled).year
       cursor pointer
       &:hover:not(.selected)
-        color $selectedColor
+        color $hoverColor
     &.selected
       background $selectedColor
       &:hover
@@ -1185,7 +1272,7 @@ $border = 1px solid #dfe4ed
         bottom 0px
         width 8px
         height 8px
-        background-color green
+        background-color $selectedColor
         border-radius 100%
     &.highlighted
       background #cae5ed
@@ -1205,7 +1292,7 @@ $border = 1px solid #dfe4ed
   .month,
   .year
     width 33.333%
-  &-footer
+  &-footer    
     display flex
     justify-content space-between
     border-top $border
@@ -1218,11 +1305,9 @@ $border = 1px solid #dfe4ed
       color #5a5e66
       -webkit-appearance none
       text-align center
-      box-sizing border-box
       outline none
       margin 0
       font-weight 500
-      user-select none
       font-size 14px
 
 
