@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>1. Group select</h2>
     <date-picker inline v-model="date"
       :format="format"
       showTool
@@ -10,9 +11,9 @@
       :disabled="disabled"
       @selected="changeDate">
     </date-picker>
-    <br/>
+    <h2>2. Multiple select</h2>
     <date-picker clearable calendarButton showTool :height="35" @selected="changeDate" placeholder="Select Date" :format="format" v-model="date1"></date-picker>
-    <br/>
+    <h2>3. Singal Select</h2>
     <date-picker placeholder="Select Date" clearable @selected="changeDate" v-model="date2"></date-picker>
   </div>
 </template>
@@ -26,17 +27,17 @@ export default {
   data() {
     return {
       date2: '',
-      date1: [new Date(2017, 11, 8).setHours(0, 0, 0, 0)],
-      date: [new Date(2017, 11, 8).setHours(0, 0, 0, 0)],
+      date1: [+new Date(2017, 11, 8)],
+      date: [+new Date(2017, 11, 8)],
       format: 'yyyy-MM-dd',
       dayGroups: [{
         type: 1,
         class: 'picker-group1',
-        days: [new Date(2017, 11, 12).setHours(0, 0, 0, 0), new Date(2017, 11, 13).setHours(0, 0, 0, 0)]
+        days: [+new Date(2017, 11, 12), +new Date(2017, 11, 13)]
       }, {
         type: 2,
         class: 'picker-group2',
-        days: [new Date(2017, 11, 1).setHours(0, 0, 0, 0), new Date(2017, 11, 2).setHours(0, 0, 0, 0)]
+        days: [+new Date(2017, 11, 1), +new Date(2017, 11, 2).setHours(0, 0, 0, 0)]
       }, {
         type: 3,
         class: 'picker-group3',

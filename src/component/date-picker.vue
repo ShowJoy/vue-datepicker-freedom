@@ -72,7 +72,7 @@
                   :key="day.timestamp"
                   track-by="timestamp"
                   v-bind:class="dayClasses(day)"
-                  @click="selectDate(day)">{{ day.date }}</span>
+                  @click="selectDate(day)"><label>{{ day.date }}</label></span>
             </div>
           </div>
         </template>
@@ -96,7 +96,7 @@
               :key="month.timestamp"
               track-by="timestamp"
               v-bind:class="{ 'selected': month.isSelected, 'disabled': month.isDisabled }"
-              @click.stop="selectMonth(month)">{{ month.month }}</span>
+              @click.stop="selectMonth(month)"><label>{{ month.month }}</label></span>
           </div>
         </template>
 
@@ -116,7 +116,7 @@
               :key="year.timestamp"
               track-by="timestamp"
               v-bind:class="{ 'selected': year.isSelected, 'disabled': year.isDisabled }"
-              @click.stop="selectYear(year)">{{ year.year }}</span>
+              @click.stop="selectYear(year)"><label>{{ year.year }}</label></span>
           </div>
         </template>
 
@@ -938,6 +938,7 @@ export default {
      * @param {Date|String|null} date
      */
     setValue (date) {
+      console.log('ddd');
       if (typeof date === 'string') {
         let parsed = new Date(date);
         date = isNaN(parsed.valueOf()) ? null : parsed;
@@ -950,9 +951,9 @@ export default {
       if (Utils.isValidDate(date)) {
         this.selectedDate = date;
         this.setPageDate(date);
-      } else if (Utils.isArray(date) && !isNaN(date[0])) {
-        this.selectedDate = new Date(date[0]);
-        this.setPageDate(date[0]);
+      } else if (Utils.isArray(date) && !isNaN(date[date.length - 1])) {
+        this.selectedDate = new Date(date[date.length - 1]);
+        this.setPageDate(date[date.length - 1]);
       }
     },
     setPageDate (date) {
@@ -1030,18 +1031,13 @@ export default {
       this.defaultValue =  Utils.copy(this.value);
     },
     init () {
-      if (this.value) {
-        this.setValue(this.value);
-      }
-      if (this.isInline) {
-        this.setInitialView();
-      }
+      this.isInline && this.setInitialView();
+      this.dayGroups = Utils.copy(this.defaultDayGroups);
+      this.setDefaultValue();
     }
   },
   mounted () {
     this.init();
-    this.dayGroups = Utils.copy(this.defaultDayGroups);
-    this.setDefaultValue();
   }
 }
 </script>
@@ -1126,7 +1122,7 @@ $border = 1px solid #dfe4ed
       cursor pointer
     
     &-fakeinput.is-check
-      width 220px
+      width 222px
     &-fakeinput
       font-size 14px
       position relative
