@@ -24,23 +24,10 @@ export default {
     DatePicker
   },
   data() {
-    let self = this;
     return {
       date2: '',
       date1: [new Date(2017, 11, 8).setHours(0, 0, 0, 0)],
       date: [new Date(2017, 11, 8).setHours(0, 0, 0, 0)],
-      groups: Array.apply(null, { length: 2 }).map((g, groupIndex) => {
-        return {
-          id: `group_${groupIndex + 1}`,
-          label: `分组${groupIndex + 1}`,
-          children: Array.apply(null, { length: 8 }).map((c, i) => {
-            return {
-              id: `option_${groupIndex + 1}_${i + 1}`,
-              label: `选项_${groupIndex + 1}_${i + 1}`
-            };
-          })
-        };
-      }),
       format: 'yyyy-MM-dd',
       dayGroups: [{
         type: 1,

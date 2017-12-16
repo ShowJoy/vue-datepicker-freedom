@@ -27,7 +27,6 @@
           :value="inputValue"
           :open-date="openDate"
           :placeholder="placeholder"
-          :clear-button="clearButton"
           :disabled="disabledPicker"
           :required="required"
           :style="`height: ${ selectHeight }px`"
@@ -173,11 +172,6 @@ export default {
     inputClass: [String, Object],
     wrapperClass: [String, Object],
     mondayFirst: Boolean,
-    clearButton: Boolean,
-    clearButtonIcon: String,
-    calendarButton: Boolean,
-    calendarButtonIcon: String,
-    calendarButtonIconContent: String,
     bootstrapStyling: Boolean,
     initialView: String,
     disabledPicker: Boolean,
