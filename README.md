@@ -3,4 +3,4 @@ A easily customized and configurable datepicker based on [vuejs-datepicker](http
 
 ## Crude Demo
 
-[linke](https://showjoy.github.io/vue-datepicker-freedom/#/markdown)
+[vue-datepicker-freedom, fight for freedom ^_^](https://showjoy.github.io/vue-datepicker-freedom/#/markdown)
