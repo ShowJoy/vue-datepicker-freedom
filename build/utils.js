@@ -1,6 +1,5 @@
 var path = require('path');
 var config = require('../config');
-var ExtractTextPlugin = require('extract-text-webpack-plugin'); // 从chunk中提取出*.css，移动到独立的css文件
 
 exports.assetsPath = function (_path) {
   var assetsSubDirectory = process.env.NODE_ENV === 'production'
@@ -31,14 +30,7 @@ exports.cssLoaders = function (options) {
       });
     }
 
-    if (options.extract) {
-      return ExtractTextPlugin.extract({
-        use: loaders,
-        fallback: 'vue-style-loader'
-      });
-    } else {
-      return ['vue-style-loader'].concat(loaders);
-    }
+    return ['vue-style-loader'].concat(loaders);
   }
 
   return {

@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "node build/dev-server.js",
-    "build": "rm -rf dist && node build/build.js",
+    "build": "node build/build.js",
     "lint": "eslint src",
     "test": "npm run lint"
   },
