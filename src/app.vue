@@ -14,7 +14,7 @@
     <h2>2. Multiple select</h2>
     <date-picker clearable calendarButton showTool :height="35" @selected="changeDate" placeholder="Select Date" :format="format" v-model="date1"></date-picker>
     <h2>3. Singal Select</h2>
-    <date-picker placeholder="Select Date" clearable @selected="changeDate" v-model="date2"></date-picker>
+    <date-picker placeholder="Select Date" :highlighted="highlighted" clearable @selected="changeDate" v-model="date2"></date-picker>
   </div>
 </template>
 
@@ -28,7 +28,7 @@ export default {
     return {
       date2: '',
       date1: [new Date(2017, 11, 8)],
-      date: [+new Date(2017, 11, 8)],
+      date: [new Date(2017, 11, 8)],
       format: 'yyyy-MM-dd',
       dayGroups: [{
         type: 1,
@@ -37,7 +37,7 @@ export default {
       }, {
         type: 2,
         class: 'picker-group2',
-        dates: [+new Date(2017, 11, 1), new Date(2017, 11, 2)]
+        dates: [new Date(2017, 11, 1), new Date(2017, 11, 2)]
       }, {
         type: 3,
         class: 'picker-group3',
@@ -91,7 +91,7 @@ export default {
         }
       },
       highlighted: {
-        days: [1, 2]
+        days: [1, 4]
       }
     };
   },
@@ -101,11 +101,6 @@ export default {
     },
     changeDate(selected) {
       console.log('current date:', selected);
-    },
-    onClick() {
-      // wokerDemo();
-      console.log(this.date);
-      this.dayGroups[0].days.push(new Date(2017, 11, 30).setHours(0, 0, 0, 0));
     }
   }
 };

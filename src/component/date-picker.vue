@@ -1239,7 +1239,6 @@ $border = 1px solid #dfe4ed
     line-height 40px
     text-align center
     vertical-align middle
-    border-radius 50%
     border 1px solid transparent
     &:not(.blank):not(.disabled).day
     &:not(.blank):not(.disabled).month
@@ -1262,9 +1261,9 @@ $border = 1px solid #dfe4ed
         width 8px
         height 8px
         background-color $selectedColor
-        border-radius 100%
+        border-radius 50%
     &.highlighted
-      background $selectedColor
+      background #cae5ed
     &.grey
       color #888
 
