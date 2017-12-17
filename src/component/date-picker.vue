@@ -251,7 +251,7 @@ export default {
       this.setInitialView();
     },
     defaultDayGroups(value) {
-      this.dayGroups = Utils.copy(this.defaultDayGroups);
+      this.dayGroups = Utils.copy(this.defaultDayGroups, true);
     }
   },
   computed: {
@@ -425,7 +425,7 @@ export default {
     },
     resetDayGroups() {
       if (this.isCheck) {
-        this.dayGroups = Utils.copy(this.defaultDayGroups);
+        this.dayGroups = Utils.copy(this.defaultDayGroups, true);
         this.$emit('input', this.defaultValue);
         this.$emit('changedGroup', this.dayGroups);
       }
@@ -521,10 +521,10 @@ export default {
       // save checked date
       if (this.isCheck) {
         let ymd = new Date(timestamp).setHours(0, 0, 0, 0);
-        let index = this.value.indexOf(ymd);
+        let index = Utils.indexOfDate(this.value, ymd);
         tempValue = Utils.copy(this.value);
         if (index === -1) {
-          tempValue.push(ymd);
+          tempValue.push(new Date(ymd));
         } else {
           tempValue.splice(index, 1);
         }
@@ -714,7 +714,7 @@ export default {
       let ymd = dObj.setHours(0, 0, 0, 0);
       for (let i in this.dayGroups) {
         let item = this.dayGroups[i];
-        if (item.days.indexOf(ymd) > -1) {
+        if (Utils.indexOfDate(item.dates, ymd) !== -1) {
           return item.class;
         }
       }
@@ -726,7 +726,7 @@ export default {
      * @return {Boolean}
      */
     isCheckedDate(dObj) {
-      return this.value.length && this.value.indexOf(new Date(+dObj).setHours(0, 0, 0, 0)) > -1;
+      return this.value.length && Utils.indexOfDate(this.value, dObj) > -1;
     },
     /**
      * Whether a day is selected
@@ -938,7 +938,6 @@ export default {
      * @param {Date|String|null} date
      */
     setValue (date) {
-      console.log('ddd');
       if (typeof date === 'string') {
         let parsed = new Date(date);
         date = isNaN(parsed.valueOf()) ? null : parsed;
@@ -951,7 +950,7 @@ export default {
       if (Utils.isValidDate(date)) {
         this.selectedDate = date;
         this.setPageDate(date);
-      } else if (Utils.isArray(date) && !isNaN(date[date.length - 1])) {
+      } else if (Utils.isArray(date)) {
         this.selectedDate = new Date(date[date.length - 1]);
         this.setPageDate(date[date.length - 1]);
       }
@@ -1003,12 +1002,12 @@ export default {
       let dayGroup = this.dayGroups.find(item => item.type === type);
       this.dayGroups.reduce((arr, item) => {
         if (item.type !== type) {
-          item.days = Utils.filterDateArray(item.days, this.value);
+          item.dates = Utils.filterDateArray(item.dates, this.value);
           arr.push(item);
         }
         return arr;
       }, []);
-      dayGroup.days = Utils.extendDateArray(dayGroup.days, this.value);
+      dayGroup.dates = Utils.extendDateArray(dayGroup.dates, this.value);
       !unclearCheckedDates && this.$emit('input', []);
       this.$emit('changedGroup', this.dayGroups);
     },
@@ -1032,7 +1031,7 @@ export default {
     },
     init () {
       this.isInline && this.setInitialView();
-      this.dayGroups = Utils.copy(this.defaultDayGroups);
+      this.dayGroups = Utils.copy(this.defaultDayGroups, true);
       this.setDefaultValue();
     }
   },
@@ -1265,7 +1264,7 @@ $border = 1px solid #dfe4ed
         background-color $selectedColor
         border-radius 100%
     &.highlighted
-      background #cae5ed
+      background $selectedColor
     &.grey
       color #888
 

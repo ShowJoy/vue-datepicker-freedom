@@ -27,21 +27,21 @@ export default {
   data() {
     return {
       date2: '',
-      date1: [+new Date(2017, 11, 8)],
+      date1: [new Date(2017, 11, 8)],
       date: [+new Date(2017, 11, 8)],
       format: 'yyyy-MM-dd',
       dayGroups: [{
         type: 1,
         class: 'picker-group1',
-        days: [+new Date(2017, 11, 12), +new Date(2017, 11, 13)]
+        dates: [new Date(2017, 11, 12), new Date(2017, 11, 13)]
       }, {
         type: 2,
         class: 'picker-group2',
-        days: [+new Date(2017, 11, 1), +new Date(2017, 11, 2).setHours(0, 0, 0, 0)]
+        dates: [+new Date(2017, 11, 1), new Date(2017, 11, 2)]
       }, {
         type: 3,
         class: 'picker-group3',
-        days: []
+        dates: []
       }],
       sidebarOptions: {
         position: 'top',
@@ -89,6 +89,9 @@ export default {
             return true;
           }
         }
+      },
+      highlighted: {
+        days: [1, 2]
       }
     };
   },

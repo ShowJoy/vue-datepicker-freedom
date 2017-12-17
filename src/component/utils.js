@@ -8,18 +8,18 @@ export default {
    * @return {Boolean}
    */
   isValidDate (date) {
-    if (Object.prototype.toString.call(date) !== '[object Date]') {
+    if ({}.toString.call(date) !== '[object Date]') {
       return false;
     }
     return !isNaN(date.getTime());
   },
 
   isArray (obj) {
-    return Object.prototype.toString.call(obj) === '[object Array]';
+    return {}.toString.call(obj) === '[object Array]';
   },
 
   isFunction (obj) {
-    return Object.prototype.toString.call(obj) === '[object Function]';
+    return {}.toString.call(obj) === '[object Function]';
   },
 
   /**
@@ -152,7 +152,7 @@ export default {
    */
   extendDateArray(one, two) {
     return one.concat(two).reduce((arr, val) => {
-      if (arr.indexOf(val) < 0) {
+      if (this.indexOfDate(arr, val) === -1) {
         arr.push(val);
       }
       return arr;
@@ -165,7 +165,21 @@ export default {
    * @param {Date} two 
    */
   filterDateArray(one, two) {
-    return one.filter(item => two.indexOf(item) === -1);
+    return one.filter(item => this.indexOfDate(two, item) === -1);
+  },
+
+  /**
+   * whether or not include val in arr
+   * @param {Array} arr
+   * @param {Date|Number} val
+   */
+  indexOfDate(arr, val) {
+    for (let i = 0; i < arr.length; i++) {
+      if (+new Date(arr[i]) === +new Date(val)) {
+        return i;
+      }
+    }
+    return -1;
   },
 
   /**
@@ -177,8 +191,53 @@ export default {
     return dates.map(date => +date);
   },
 
-  copy(obj) {
-    return JSON.parse(JSON.stringify(obj));
+  /**
+   * copy object
+   * @param {Object} obj 
+   * @param {Boolean} deep 
+   */
+  copy(obj, deep){
+    let args = [].slice.apply(arguments);
+    let temp;
+
+    let isObject = function(obj) {
+        return {}.toString.call(obj) == "[object Object]";
+    };
+    let isArray = function(obj) {
+        return {}.toString.call(obj) == "[object Array]";
+    };
+
+    isObject(obj) && (temp = {});
+    isArray(obj) && (temp = []);
+
+    function recursive(temp, obj){
+      for(let attr in obj) {
+        if(obj.hasOwnProperty(attr)) {
+          if(isObject(obj[attr])) {
+            temp[attr] = temp[attr] || {};
+            recursive(temp[attr], obj[attr]);
+          }else{
+            temp[attr] = obj[attr];
+          }
+        }
+      }
+    }
+
+    function plain(temp, obj){
+      for(let attr in obj){
+        if(obj.hasOwnProperty(attr)){
+          temp[attr] = obj[attr];
+        }
+      }
+    }
+
+    if (deep) {
+      recursive(temp, obj);
+    } else {
+      plain(temp, obj);
+    }
+
+    return temp;
   }
 
 }
