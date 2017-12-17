@@ -1,6 +1,6 @@
 {
   "name": "vue-datepicker-freedom",
-  "version": "0.0.3",
+  "version": "0.0.9",
   "description": "A easily customized datepicker based on vuejs-datepicker",
   "keywords": [
     "vue",
@@ -10,7 +10,8 @@
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
     "lint": "eslint src",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "go": "npm run build && npm version patch && npm publish"
   },
   "author": "13167066609@163.com",
   "license": "MIT",
