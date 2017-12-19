@@ -950,7 +950,7 @@ export default {
       if (Utils.isValidDate(date)) {
         this.selectedDate = date;
         this.setPageDate(date);
-      } else if (Utils.isArray(date)) {
+      } else if (Utils.isArray(date) && date.length > 0) {
         this.selectedDate = new Date(date[date.length - 1]);
         this.setPageDate(date[date.length - 1]);
       }
