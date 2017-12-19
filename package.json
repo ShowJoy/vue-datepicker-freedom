@@ -86,10 +86,10 @@
   "main": "dist/main.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ShowJoy/vue-custom-datepicker.git"
+    "url": "git+https://github.com/ShowJoy/vue-datepicker-freedom.git"
   },
   "bugs": {
-    "url": "https://github.com/ShowJoy/vue-custom-datepicker/issues"
+    "url": "https://github.com/ShowJoy/vue-datepicker-freedom/issues"
   },
-  "homepage": "https://github.com/ShowJoy/vue-custom-datepicker#readme"
+  "homepage": "https://github.com/ShowJoy/vue-datepicker-freedom#readme"
 }
