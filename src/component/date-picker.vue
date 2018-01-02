@@ -238,7 +238,7 @@ export default {
   },
   watch: {
     value: {
-      handler: function (value) {
+      handler (value) {
         this.computeSelectHeight();
         this.setValue(value);
       },
@@ -250,8 +250,11 @@ export default {
     initialView () {
       this.setInitialView();
     },
-    defaultDayGroups(value) {
-      this.dayGroups = Utils.copy(this.defaultDayGroups, true);
+    defaultDayGroups: {
+      handler (value) {
+        this.dayGroups = Utils.copy(this.defaultDayGroups, true);
+      },
+      deep: true
     }
   },
   computed: {

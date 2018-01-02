@@ -11,9 +11,10 @@
       :disabled="disabled"
       @selected="changeDate">
     </date-picker>
+    <button @click="aaa">fdsfdsa</button>
     <h2>2. Multiple select</h2>
     <date-picker clearable calendarButton showTool :height="35" @selected="changeDate" placeholder="Select Date" :format="format" v-model="date1"></date-picker>
-    <h2>3. Singal Select</h2>
+    <h2>3. Single Select</h2>
     <date-picker placeholder="Select Date" :highlighted="highlighted" clearable @selected="changeDate" v-model="date2"></date-picker>
   </div>
 </template>
@@ -97,6 +98,9 @@ export default {
     };
   },
   methods: {
+    aaa() {
+      this.dayGroups[0].dates = [new Date(2017, 11, 14)];
+    },
     changedGroup(val) {
       console.log(val);
     },
